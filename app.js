@@ -8,6 +8,8 @@ app = express();
 app.set ('view engine', 'jade');
 app.set ('views', __dirname + "/views");
 
+app.use (express.static('public'));
+
 // attempt to connect to MongoDB
 MongoClient.connect("mongodb://localhost:27017/garden", function (err,db){
 	assert.equal(null, err);  // crashes if error not null
@@ -38,6 +40,15 @@ MongoClient.connect("mongodb://localhost:27017/garden", function (err,db){
 			});  // end of the distinct query
 		});  // end of find query
 	});  // end of show colors button
+	
+	// displaying the details for a flower when a flower is clicked
+	app.get('/details/:flower', function(req,res){
+		var flowerName = req.params.flower  // get value of the 'flower' name
+		db.collection('flowers').findOne({'name':flowerName}, function (err, doc){
+			if (err) {return res.sendStatus(500);}
+			return res.render('flowerDetails', doc)
+		});  // end of find one
+	});  // end of details
 	
 	// all other requests, return 404 not found
 	app.use (function(req, res){
