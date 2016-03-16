@@ -25,7 +25,19 @@ MongoClient.connect("mongodb://localhost:27017/garden", function (err,db){
 	});  // end of main page
 	
 	// form handling route - when the user clicks on the show colors button that says Choose color
-	
+	app.get('/showColors', function(req,res){
+		var color = req.query.colorDropDown;
+		
+		// get all flowers of desired color
+		db.collection('flowers').find({"color":color}, {"name":true, "color":true}).toArray(function(err, docs){
+			if (err) {return res.sendStatus(500);}
+			db.collection('flowers').distinct('color', function(err,colordocs){
+				if (err) {return res.sendStatus(500);}
+				var displayColor = color.slice(0,1).toUpperCase() + color.slice(1,color.length)
+				return res.render('allflowers', {'flowers': docs, 'flowercolors':colordocs, 'currentColor':displayColor});
+			});  // end of the distinct query
+		});  // end of find query
+	});  // end of show colors button
 	
 	// all other requests, return 404 not found
 	app.use (function(req, res){
