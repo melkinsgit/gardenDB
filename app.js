@@ -15,11 +15,17 @@ MongoClient.connect("mongodb://localhost:27017/garden", function (err,db){
 	
 	// routes - this is for the home page
 	app.get('/', function (req, res){
-		db.collection('flowers').find({}, {"name":true, "color":true}).toArray(function(err, docs){
+		db.collection('flowers').find({}, {"name":true, "color":true}).toArray(function(err, flowerdocs){
 			if (err) {return res.sendStatus(500);}
-			return res.render('allflowers', {"flowers": docs});
-		});
-	});
+			db.collection('flowers').distinct('color', function(err,colordocs){
+				if (err) {return res.sendStatus(500);}
+				return res.render('allflowers', {'flowers': flowerdocs, 'flowercolors':colordocs});
+			});  // end of the distinct query
+		});  // end of find query
+	});  // end of main page
+	
+	// form handling route - when the user clicks on the show colors button that says Choose color
+	
 	
 	// all other requests, return 404 not found
 	app.use (function(req, res){
