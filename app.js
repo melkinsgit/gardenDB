@@ -35,7 +35,7 @@ MongoClient.connect("mongodb://localhost:27017/garden", function (err,db){
 			if (err) {return res.sendStatus(500);}
 			db.collection('flowers').distinct('color', function(err,colordocs){
 				if (err) {return res.sendStatus(500);}
-				var displayColor = color.slice(0,1).toUpperCase() + color.slice(1,color.length)
+				var displayColor = color.slice(0,1).toUpperCase() + color.slice(1,color.length);
 				return res.render('allflowers', {'flowers': docs, 'flowercolors':colordocs, 'currentColor':displayColor});
 			});  // end of the distinct query
 		});  // end of find query
@@ -43,11 +43,15 @@ MongoClient.connect("mongodb://localhost:27017/garden", function (err,db){
 	
 	// displaying the details for a flower when a flower is clicked
 	app.get('/details/:flower', function(req,res){
-		var flowerName = req.params.flower  // get value of the 'flower' name
-		db.collection('flowers').findOne({'name':flowerName}, function (err, doc){
-			if (err) {return res.sendStatus(500);}
-			return res.render('flowerDetails', doc)
-		});  // end of find one
+		var flowerName = req.params.flower;  // get value of the 'flower' name
+		db.collection('flowers').find({'name':flowerName}).limit(1).toArray (function (err, docs){
+			if (err) {console.log(err); return res.sendStatus(500);}
+			if (docs.length != 1){
+				console.log(docs);
+				return res.sendStatus(404);
+			}
+			return res.render('flowerDetails', docs[0]);
+		});  // end of find
 	});  // end of details
 	
 	// all other requests, return 404 not found
