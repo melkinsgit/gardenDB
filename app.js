@@ -93,8 +93,11 @@ MongoClient.connect("mongodb://localhost:27017/garden", function (err,db){
 		res.sendStatus(404);
 	});
 	
+	// need option to 3010 for Heroku
+	var port = process.env.PORT || 3000;
+	
 	// and start the server on any port you like
-	var server = app.listen(3000, function(){
+	var server = app.listen(port, function(){
 		var port = server.address().port;
 		console.log("Server listening on port " + port);
 	});
