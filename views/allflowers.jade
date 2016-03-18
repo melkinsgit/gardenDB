@@ -2,6 +2,8 @@ extends base
 block content
 
 	h1 #{currentColor} Flowers
+	
+	h2 Explore Flowers
 
 	form(action='showColors', methods='get')
 		select(name='colorDropDown')
@@ -13,6 +15,12 @@ block content
 		each flower in flowers
 			li
 				a(href='/details/#{flower.name}') #{flower.name}
+				
+	p
+	p
+	hr
+				
+	h2 Add Flowers
 
 	form(action='addNewFlower', method='post')
 		p Name
