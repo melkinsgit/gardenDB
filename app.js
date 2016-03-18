@@ -2,6 +2,7 @@ var express = require('express');
 var MongoClient = require('mongodb').MongoClient;
 var engines = require ('jade');
 var assert = require ('assert');
+var bodyParser = require ('body-parser');
 
 app = express();
 
@@ -9,6 +10,7 @@ app.set ('view engine', 'jade');
 app.set ('views', __dirname + "/views");
 
 app.use (express.static('public'));
+app.use (bodyParser.urlencoded({ extended : true}));
 
 // attempt to connect to MongoDB
 MongoClient.connect("mongodb://localhost:27017/garden", function (err,db){
@@ -53,6 +55,29 @@ MongoClient.connect("mongodb://localhost:27017/garden", function (err,db){
 			return res.render('flowerDetails', docs[0]);
 		});  // end of find
 	});  // end of details
+	
+	// a post route for the data from the form
+	// addNewFlower is the var name for the form action - or the form data
+	app.post('/addNewFlower', function (req, res){
+		// insert the data from the form and to a garden db flowers collection insert
+		
+		// get the flower name from the req data
+		var flowerName = req.body.name;
+		// search db garden collection flowers for all flowers of that name and put them in array
+		db.collection('flowers').find({'name':flowerName}).toArray (function (err, docs){
+			if (err) {console.log(err); return res.sendStatus(500);}  // handle error
+			// if the resulting array has any elements, then the flower name already exists, but if there are no elements (array length is 0), then do the db garden collection flowers insert for that flower
+			if (docs.length == 0){
+				db.collection('flowers').insert(req.body, function(err, result) {
+					if (err) { return res.sendStatus(500);}
+				});  // end insert
+			}  // end if
+			else {
+				console.log('That flower already exists in the list. It will not be added.');
+			}  // end else
+			return res.redirect('/');  // then redirect to main page, with or without new flower as appropriate
+		});  // end of find to array docs
+	}); // end of post
 	
 	// all other requests, return 404 not found
 	app.use (function(req, res){
