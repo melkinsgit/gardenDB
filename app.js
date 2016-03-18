@@ -85,6 +85,7 @@ MongoClient.connect("mongodb://localhost:27017/garden", function (err,db){
 			}  // end else
 			return res.redirect('/');  // then redirect to main page, with or without new flower as appropriate
 		});  // end of find to array docs
+		console.log('making fix for heroku');
 		}
 	}); // end of post
 	
