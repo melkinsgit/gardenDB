@@ -63,11 +63,19 @@ MongoClient.connect("mongodb://localhost:27017/garden", function (err,db){
 		
 		// get the flower name from the req data
 		var flowerName = req.body.name;
+		console.log(flowerName);
+		// var flowerColor = req.query.color;
+		
+		// if (flowerName == ""){
+			// console.log('no flower name');
+			// return res.render("duplicateFlower", flowerName);
+		// }
 		// search db garden collection flowers for all flowers of that name and put them in array
 		db.collection('flowers').find({'name':flowerName}).toArray (function (err, docs){
 			if (err) {console.log(err); return res.sendStatus(500);}  // handle error
 			// if the resulting array has any elements, then the flower name already exists, but if there are no elements (array length is 0), then do the db garden collection flowers insert for that flower
 			if (docs.length == 0){
+				console.log('docs is length 0');
 				db.collection('flowers').insert(req.body, function(err, result) {
 					if (err) { return res.sendStatus(500);}
 				});  // end insert
